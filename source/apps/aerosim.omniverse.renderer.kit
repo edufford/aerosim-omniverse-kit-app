@@ -15,7 +15,7 @@ keywords = ["app", "AeroSim", "viewport"] # Makes this browsable in the UI under
 "omni.kit.window.toolbar" = {}
 
 "aerosim.omniverse.extension" = {}
-"cesium.omniverse" = {}
+# "cesium.omniverse" = {}  # Disabled for Kit 107.3.0 (requires rebuild for Python 3.11)
 
 [settings]
 app.content.emptyStageOnStart = true
@@ -23,7 +23,7 @@ app.exts.folders.'++' = ["${app}/../exts"] # Make extensions from this repo avai
 app.window.title = "AeroSim Omniverse Renderer"
 app.window.width = 1700
 app.window.height = 900
-exts."cesium.omniverse".showOnStartup = false
+# exts."cesium.omniverse".showOnStartup = false  # Disabled for Kit 107.3.0
 app.useFabricSceneDelegate = true
 
 [settings.exts."omni.kit.registry.nucleus"]
