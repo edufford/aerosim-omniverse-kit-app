@@ -7,14 +7,14 @@ keywords = ["AeroSim", "dev", "app"]
 [dependencies]
 "omni.app.dev" = {}
 "aerosim.omniverse.extension" = {}
-# "cesium.omniverse" = {}  # Disabled for Kit 107.3.0 (requires rebuild for Python 3.11)
+"cesium.omniverse" = {}
 # "omni.kit.livestream.webrtc" = {}  # Disabled for Kit 107.3.0 (not available for Python 3.11)
 
 [settings.app.exts]
 folders.'++' = ["${app}/../exts"] # Make extensions from this repo available.
 
 [settings]
-# exts."cesium.omniverse".showOnStartup = false  # Disabled for Kit 107.3.0
+exts."cesium.omniverse".showOnStartup = false
 app.useFabricSceneDelegate = true
 app.usdrt.scene_delegate.enableProxyCubes = false
 app.usdrt.scene_delegate.geometryStreaming.enabled = false

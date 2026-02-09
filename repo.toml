@@ -43,8 +43,8 @@ sphinx_exclude_patterns = [
 [repo_docs.kit]
 extensions = [
     "aerosim.omniverse.extension",
-    # "cesium.omniverse",  # Disabled for Kit 107.3.0
-    # "cesium.usd.plugins",  # Disabled for Kit 107.3.0
+    "cesium.omniverse",
+    "cesium.usd.plugins",
 ]
 
 [repo_package.packages."platform:windows-x86_64".docs]
