@@ -4,9 +4,10 @@
 
 TARGET_DIR="$AEROSIM_OMNIVERSE_ROOT/source/extensions"
 AEROSIM_EXTENSION="aerosim.omniverse.extension"
+
 CESIUM_FOLDER1="cesium.omniverse"
 CESIUM_FOLDER2="cesium.usd.plugins"
-ZIP_URL="https://github.com/CesiumGS/cesium-omniverse/releases/download/v0.24.0/CesiumGS-cesium-omniverse-linux-x86_64-v0.24.0.zip"
+ZIP_URL="https://github.com/CesiumGS/cesium-omniverse/releases/download/v0.27.0/CesiumGS-cesium-omniverse-linux-x86_64-v0.27.0.zip"
 ZIP_FILE="$TARGET_DIR/cesium_omniverse.zip"
 EXTRACT_PATH="$TARGET_DIR"
 SETUP_CESIUM=true
