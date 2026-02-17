@@ -11,7 +11,7 @@ keywords = ["AeroSim", "dev", "app"]
 # "omni.kit.livestream.webrtc" = {}  # Disabled for Kit 107.3.0 (not available for Python 3.11)
 
 [settings.app.exts]
-folders.'++' = ["${app}/../exts"] # Make extensions from this repo available.
+folders.'++' = ["${app}/../exts", "${app}/../extscache/"] # Make extensions from this repo available.
 
 [settings]
 exts."cesium.omniverse".showOnStartup = false
