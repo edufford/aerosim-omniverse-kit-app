@@ -11,50 +11,65 @@ set "ZIP_URL=https://github.com/CesiumGS/cesium-omniverse/releases/download/%CES
 set "ZIP_FILE=%TARGET_DIR%\cesium_omniverse.zip"
 set "EXTRACT_PATH=%TARGET_DIR%"
 
-:: Check if the folders exist
-if exist "%TARGET_DIR%\%CESIUM_FOLDER1%" (
-    echo Folder %CESIUM_FOLDER1% already exists. No need to download.
-    goto :cesium_done
+:: Check if both folders exist
+if exist "%TARGET_DIR%\%CESIUM_FOLDER1%\" (
+    if exist "%TARGET_DIR%\%CESIUM_FOLDER2%\" (
+        echo Cesium extension folders already exist. No need to download.
+        goto :cesium_done
+    )
 )
 
-if exist "%TARGET_DIR%\%CESIUM_FOLDER2%" (
-    echo Folder %CESIUM_FOLDER2% already exists. No need to download.
-    goto :cesium_done
-)
+:: Create target directory if it doesn't exist
+if not exist "%TARGET_DIR%" mkdir "%TARGET_DIR%"
 
 :: Download the ZIP file if the folders don't exist
 echo Downloading Cesium Omniverse %CESIUM_VERSION%...
 powershell -Command "(New-Object Net.WebClient).DownloadFile('%ZIP_URL%', '%ZIP_FILE%')"
-
-:: Check if the download was successful
-if exist "%ZIP_FILE%" (
-    echo File downloaded successfully.
-
-    :: Extract the ZIP file
-    echo Extracting the file to %EXTRACT_PATH%...
-    powershell -Command "Expand-Archive -Path '%ZIP_FILE%' -DestinationPath '%EXTRACT_PATH%' -Force"
-
-    :: Check if extraction was successful
-    if exist "%EXTRACT_PATH%\%CESIUM_FOLDER1%" (
-        echo Extraction completed successfully.
-    ) else (
-        echo Error: The folder %CESIUM_FOLDER1% was not found after extraction.
-    )
-
-    echo repo_build.prebuild_link { "mdl", ext.target_dir.."/mdl" } >> "%TARGET_DIR%\%CESIUM_FOLDER1%\premake5.lua"
-    echo repo_build.prebuild_link { "vendor", ext.target_dir.."/vendor" } >> "%TARGET_DIR%\%CESIUM_FOLDER1%\premake5.lua"
-
-    :: Delete the ZIP file after extraction
-    del "%ZIP_FILE%"
-    echo ZIP file deleted.
-) else (
+if %errorlevel% neq 0 (
     echo Error: The file could not be downloaded.
+    exit /b 1
 )
+echo File downloaded successfully.
+
+:: Extract the ZIP file
+echo Extracting the file to %EXTRACT_PATH%...
+powershell -Command "Expand-Archive -Path '%ZIP_FILE%' -DestinationPath '%EXTRACT_PATH%' -Force"
+if %errorlevel% neq 0 (
+    echo Error: Extraction failed.
+    exit /b 1
+)
+echo Extraction completed successfully.
+
+:: Check if extraction was successful
+if exist "%EXTRACT_PATH%\%CESIUM_FOLDER1%\" (
+    echo Extraction verified.
+) else (
+    echo Error: The folder %CESIUM_FOLDER1% was not found after extraction.
+)
+
+echo repo_build.prebuild_link { "mdl", ext.target_dir.."/mdl" } >> "%TARGET_DIR%\%CESIUM_FOLDER1%\premake5.lua"
+echo repo_build.prebuild_link { "vendor", ext.target_dir.."/vendor" } >> "%TARGET_DIR%\%CESIUM_FOLDER1%\premake5.lua"
+
+:: Delete the ZIP file after extraction
+del "%ZIP_FILE%"
+echo ZIP file deleted.
 
 :cesium_done
 
 echo AEROSIM_WORLD_LINK_LIB is set to: %AEROSIM_WORLD_LINK_LIB%
-echo %AEROSIM_WORLD_LINK_LIB%>"%TARGET_DIR%\%AEROSIM_EXTENSION%\aerosim_world_link_lib_path.txt"
+:: Copy aerosim-world-link lib files into the extension directory so they are accessible
+:: when Kit builds inside a Docker container (docker build option), where the original
+:: AEROSIM_WORLD_LINK_LIB host path may not be mounted. premake5.lua reads the path from
+:: aerosim_world_link_lib_path.txt to set includedirs, libdirs, and post-build copy commands.
+set "WORLD_LINK_LIB_DIR=%TARGET_DIR%\%AEROSIM_EXTENSION%\aerosim-world-link-lib"
+if not exist "%WORLD_LINK_LIB_DIR%" mkdir "%WORLD_LINK_LIB_DIR%"
+echo Copying AEROSIM_WORLD_LINK_LIB files to %WORLD_LINK_LIB_DIR%...
+xcopy /E /Y /I /Q "%AEROSIM_WORLD_LINK_LIB%\*" "%WORLD_LINK_LIB_DIR%"
+if %errorlevel% neq 0 (
+    echo ERROR: Failed to copy AEROSIM_WORLD_LINK_LIB files.
+    exit /b 1
+)
+echo %WORLD_LINK_LIB_DIR%>"%TARGET_DIR%\%AEROSIM_EXTENSION%\aerosim_world_link_lib_path.txt"
 
 :: =============================================================================
 :: Detect Visual Studio installation (prefer VS2026, fall back to VS2022)
