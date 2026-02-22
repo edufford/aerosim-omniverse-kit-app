@@ -2,6 +2,8 @@
 setlocal enabledelayedexpansion
 
 :: Configuration
+set "SCRIPT_DIR=%~dp0"
+set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
 set "TARGET_DIR=%AEROSIM_OMNIVERSE_ROOT%\source\extensions"
 set "AEROSIM_EXTENSION=aerosim.omniverse.extension"
 set "CESIUM_FOLDER1=cesium.omniverse"
@@ -126,7 +128,7 @@ if not exist "!VS_PATH!\VC\Auxiliary\Build\Microsoft.VCToolsVersion.v142.default
 
 :: Bootstrap repo tools (fetches repo_build to _repo\deps\repo_build via packman)
 echo Bootstrapping repo tools...
-call "%~dp0tools\packman\packman.cmd" pull "%~dp0deps\repo-deps.packman.xml"
+call "%SCRIPT_DIR%\tools\packman\packman.cmd" pull "%SCRIPT_DIR%\deps\repo-deps.packman.xml"
 if %errorlevel% neq 0 (
     echo ERROR: Failed to bootstrap repo tools.
     exit /b %errorlevel%
@@ -134,14 +136,14 @@ if %errorlevel% neq 0 (
 
 :: Apply repo_build patches for VS2022/VS2026 + v142 toolchain compatibility
 echo Applying repo_build compatibility patches...
-call "%~dp0tools\packman\python.bat" "%~dp0tools\apply_repobuild_patches.py"
+call "%SCRIPT_DIR%\tools\packman\python.bat" "%SCRIPT_DIR%\tools\apply_repobuild_patches.py"
 if %errorlevel% neq 0 (
     echo ERROR: Failed to apply repo_build patches.
     exit /b %errorlevel%
 )
 
 :: Configure repo.toml [repo_build.msbuild] for detected VS
-call "%~dp0tools\packman\python.bat" "%~dp0tools\configure_vs.py" "!VS_LABEL!" "!VS_PATH!"
+call "%SCRIPT_DIR%\tools\packman\python.bat" "%SCRIPT_DIR%\tools\configure_vs.py" "!VS_LABEL!" "!VS_PATH!"
 if %errorlevel% neq 0 (
     echo ERROR: Failed to configure repo.toml.
     exit /b %errorlevel%
@@ -149,4 +151,4 @@ if %errorlevel% neq 0 (
 
 :vs_detection_done
 
-call "%~dp0repo" build %*
+call "%SCRIPT_DIR%\repo" build %*

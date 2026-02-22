@@ -1,5 +1,5 @@
 """
-Apply compatibility patches to repo_build 1.9.1 for VS2022/VS2026 with v142 toolchain.
+Apply compatibility patches to repo_build for VS2022/VS2026 with v142 toolchain.
 
 repo_build's VS detection logic has two issues when using newer VS installations with
 the VS2019 v142 toolchain:
@@ -14,13 +14,18 @@ the VS2019 v142 toolchain:
 
 These patches make vs_version and msbuild_version default to None (accept any VS version)
 and stop the vs_version auto-update when vs_path is explicitly configured in repo.toml.
+
+The patch strings are designed to be version-agnostic: each patch checks whether the old
+pattern is present (applies it), the new pattern is already present (skips it), or neither
+(warns).
 """
 
 import os
 import sys
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-REPO_BUILD_DIR = os.path.join(REPO_ROOT, "_repo", "deps", "repo_build", "omni", "repo", "build")
+REPO_BUILD_ROOT = os.path.join(REPO_ROOT, "_repo", "deps", "repo_build")
+REPO_BUILD_DIR = os.path.join(REPO_BUILD_ROOT, "omni", "repo", "build")
 
 PATCHES = {
     "windows_utils.py": [
@@ -55,6 +60,16 @@ PATCHES = {
 }
 
 
+def get_repo_build_version():
+    """Read the version of the installed repo_build package, or return 'unknown'."""
+    version_file = os.path.join(REPO_BUILD_ROOT, "VERSION")
+    try:
+        with open(version_file, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    except OSError:
+        return "unknown"
+
+
 def patch_file(path, patches):
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -78,11 +93,12 @@ def patch_file(path, patches):
 
 def main():
     if not os.path.isdir(REPO_BUILD_DIR):
-        print(f"ERROR: repo_build not found at {REPO_BUILD_DIR}")
+        print(f"ERROR: repo_build not found at {REPO_BUILD_ROOT}")
         print("       Run 'tools\\packman\\packman.cmd pull deps\\repo-deps.packman.xml' first.")
         sys.exit(1)
 
-    print("Applying repo_build compatibility patches for VS2022/VS2026 + v142 toolchain...")
+    version = get_repo_build_version()
+    print(f"Applying repo_build {version} compatibility patches for VS2022/VS2026 + v142 toolchain...")
     for filename, patches in PATCHES.items():
         path = os.path.join(REPO_BUILD_DIR, filename)
         patch_file(path, patches)
