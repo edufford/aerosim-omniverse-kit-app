@@ -58,9 +58,15 @@ fi
 set -e
 
 echo "AEROSIM_WORLD_LINK_LIB is set to: $AEROSIM_WORLD_LINK_LIB"
-mkdir -p "$TARGET_DIR/$AEROSIM_EXTENSION/aerosim-world-link-lib"
-cp -r "$AEROSIM_WORLD_LINK_LIB"/* "$TARGET_DIR/$AEROSIM_EXTENSION/aerosim-world-link-lib"
-echo "$TARGET_DIR/$AEROSIM_EXTENSION/aerosim-world-link-lib">"$TARGET_DIR/$AEROSIM_EXTENSION/aerosim_world_link_lib_path.txt"
+# Copy aerosim-world-link lib files into the extension directory so they are accessible
+# when Kit builds inside a Docker container (docker build option), where the original
+# AEROSIM_WORLD_LINK_LIB host path may not be mounted. premake5.lua reads the path from
+# aerosim_world_link_lib_path.txt to set includedirs, libdirs, and post-build copy commands.
+WORLD_LINK_LIB_DIR="$TARGET_DIR/$AEROSIM_EXTENSION/aerosim-world-link-lib"
+mkdir -p "$WORLD_LINK_LIB_DIR"
+echo "Copying AEROSIM_WORLD_LINK_LIB files to $WORLD_LINK_LIB_DIR..."
+cp -r "$AEROSIM_WORLD_LINK_LIB"/* "$WORLD_LINK_LIB_DIR"
+echo "$WORLD_LINK_LIB_DIR">"$TARGET_DIR/$AEROSIM_EXTENSION/aerosim_world_link_lib_path.txt"
 
 SCRIPT_DIR=$(dirname ${BASH_SOURCE})
 source "$SCRIPT_DIR/repo.sh" build $@ || exit $?

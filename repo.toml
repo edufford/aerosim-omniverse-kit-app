@@ -19,8 +19,11 @@ fetch.pip.licensing_enabled = false
 enabled = false
 
 [repo_build.msbuild]
+# auto-configured by build.bat - do not edit manually
 link_host_toolchain = true
-vs_version = "vs2019" # Empty string will match all years and prioritize the newest, specifying vs2019 because of issue with usd libs and vs2022
+vs_version = "vs2019" # premake5 action for PlatformToolset=v142; USD Boost deps are vc142
+vs_path = "C:\\Program Files\\Microsoft Visual Studio\\18\\Community" # VS2026 install with v142 toolchain
+msvc_version = "v142" # MSVC 14.29 → _MSC_VER<1930 → Boost vc142 (matches USD deps)
 "token:in_ci==true".vs_version = "vs2019"
 "token:in_ci==true".vs_path = "C:\\vs2019"
 
