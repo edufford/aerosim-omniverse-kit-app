@@ -6,7 +6,8 @@ set "TARGET_DIR=%AEROSIM_OMNIVERSE_ROOT%\source\extensions"
 set "AEROSIM_EXTENSION=aerosim.omniverse.extension"
 set "CESIUM_FOLDER1=cesium.omniverse"
 set "CESIUM_FOLDER2=cesium.usd.plugins"
-set "ZIP_URL=https://github.com/CesiumGS/cesium-omniverse/releases/download/v0.24.0/CesiumGS-cesium-omniverse-windows-x86_64-v0.24.0.zip"
+set "CESIUM_VERSION=v0.27.0"
+set "ZIP_URL=https://github.com/CesiumGS/cesium-omniverse/releases/download/%CESIUM_VERSION%/CesiumGS-cesium-omniverse-windows-x86_64-%CESIUM_VERSION%.zip"
 set "ZIP_FILE=%TARGET_DIR%\cesium_omniverse.zip"
 set "EXTRACT_PATH=%TARGET_DIR%"
 
@@ -22,7 +23,7 @@ if exist "%TARGET_DIR%\%CESIUM_FOLDER2%" (
 )
 
 :: Download the ZIP file if the folders don't exist
-echo Downloading Cesium Omniverse file...
+echo Downloading Cesium Omniverse %CESIUM_VERSION%...
 powershell -Command "(New-Object Net.WebClient).DownloadFile('%ZIP_URL%', '%ZIP_FILE%')"
 
 :: Check if the download was successful
